@@ -1,0 +1,911 @@
+{% extends 'content/base.html' %}
+{% load static %}
+
+{% block title %}Home - AI Content Creator{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Modern CSS Variables */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --dark-gradient: linear-gradient(135deg, #434343 0%, #000000 100%);
+        --glass-bg: rgba(255, 255, 255, 0.95);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+        --shadow-sm: 0 10px 40px rgba(0, 0, 0, 0.08);
+        --shadow-md: 0 20px 60px rgba(0, 0, 0, 0.12);
+        --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.15);
+        --border-radius: 24px;
+        --border-radius-sm: 16px;
+    }
+
+    /* Modern Typography */
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    /* Glass Morphism Effect */
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: var(--glass-border);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Hero Section with Animated Background */
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+        padding: 100px 0;
+        border-radius: var(--border-radius);
+        margin-bottom: 60px;
+    }
+
+    .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        opacity: 0.9;
+        z-index: -1;
+    }
+
+    .hero-background::before {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+        animation: rotate 30s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 1s ease;
+    }
+
+    .hero-title span {
+        background: linear-gradient(135deg, #fff6b0 0%, #ffd93e 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        animation: fadeInUp 1s ease 0.2s both;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Floating Image Animation */
+    .floating-image {
+        animation: float 6s ease-in-out infinite;
+        filter: drop-shadow(0 20px 30px rgba(0,0,0,0.2));
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* Modern Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+        margin-bottom: 60px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 30px 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--primary-gradient);
+    }
+
+    .stat-card:nth-child(2)::before { background: var(--secondary-gradient); }
+    .stat-card:nth-child(3)::before { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+    .stat-card:nth-child(4)::before { background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%); }
+
+    .stat-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:nth-child(2) .stat-icon { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .stat-card:nth-child(3) .stat-icon { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+    .stat-card:nth-child(4) .stat-icon { background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%); }
+
+    .stat-card:hover .stat-icon {
+        transform: scale(1.1) rotate(360deg);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+        background: linear-gradient(135deg, #333 0%, #666 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+        color: #666;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    /* Modern Content Cards */
+    .content-section {
+        margin-bottom: 80px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 40px;
+        background: var(--primary-gradient);
+        border-radius: 10px;
+    }
+
+    .modern-card {
+        background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        transition: all 0.4s ease;
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+        position: relative;
+    }
+
+    .modern-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: var(--primary-gradient);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        z-index: 2;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .card-content {
+        padding: 30px;
+    }
+
+    .card-meta {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .card-meta i {
+        margin-right: 5px;
+        color: #667eea;
+    }
+
+    .card-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        line-height: 1.4;
+        color: #333;
+    }
+
+    .card-footer {
+        padding: 20px 30px;
+        background: #f8f9fa;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn-modern {
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-modern:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-primary-modern {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-outline-modern {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+
+    .btn-outline-modern:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    /* How It Works Section */
+    .steps-section {
+        padding: 80px 0;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        border-radius: var(--border-radius);
+        margin-top: 60px;
+    }
+
+    .step-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 40px 30px;
+        text-align: center;
+        position: relative;
+        transition: all 0.4s ease;
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+    }
+
+    .step-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .step-number {
+        width: 60px;
+        height: 60px;
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0 auto 25px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .step-number::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: inherit;
+        opacity: 0.3;
+        animation: pulse 2s infinite;
+        z-index: -1;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.3; }
+        50% { transform: scale(1.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 0.3; }
+    }
+
+    .step-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 25px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .step-card:hover .step-icon {
+        transform: rotateY(180deg);
+        color: #764ba2;
+    }
+
+    .step-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #333;
+    }
+
+    .step-description {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    /* Floating Elements */
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .floating-circle {
+        position: absolute;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 50%;
+        animation: floatCircle 20s infinite linear;
+    }
+
+    @keyframes floatCircle {
+        0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+        100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+    }
+
+    /* Loading Animation */
+    .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .section-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .section-title::before {
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            width: 40px;
+            height: 5px;
+            top: -10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Animated Background -->
+<section class="hero-section position-relative">
+    <div class="hero-background"></div>
+    <div class="floating-elements">
+        <div class="floating-circle" style="top: 10%; left: 5%; width: 150px; height: 150px;"></div>
+        <div class="floating-circle" style="bottom: 20%; right: 10%; width: 200px; height: 200px;"></div>
+    </div>
+    
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title">
+                    Create Content <span>50% Faster</span> with AI
+                </h1>
+                <p class="hero-subtitle">
+                    Generate engaging social media content, captions, and schedules in minutes. 
+                    Powered Advance AI.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'generate_ideas' %}" class="btn btn-modern btn-primary-modern btn-lg">
+                        <i class="fas fa-magic me-2"></i>Start Creating
+                    </a>
+                    <a href="#how-it-works" class="btn btn-modern btn-outline-modern btn-lg">
+                        <i class="fas fa-play me-2"></i>Watch Demo
+                    </a>
+                </div>
+                
+                <!-- Trust Badges -->
+                <div class="mt-5 d-flex align-items-center gap-4">
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="ms-2 text-white">4.9/5 from 2k+ reviews</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="floating-image text-center">
+                    <img src="{% static 'content/images/hero-image.png' %}" 
+                         alt="AI Content Creation" 
+                         class="img-fluid rounded-4 shadow-lg"
+                         style="max-height: 400px;">
+                    
+                    <!-- Floating Stats -->
+                    <div class="position-absolute top-25 start-0 bg-white rounded-3 p-3 shadow-lg" 
+                         style="transform: translate(-20%, 50%);">
+                        <small class="text-muted">Generated Today</small>
+                        <h4 class="mb-0 text-primary">1,234 posts</h4>
+                    </div>
+                    
+                    <div class="position-absolute bottom-25 end-0 bg-white rounded-3 p-3 shadow-lg"
+                         style="transform: translate(20%, -50%);">
+                        <small class="text-muted">Time Saved</small>
+                        <h4 class="mb-0 text-success">4.2 hrs</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container">
+    <!-- Stats Section with Modern Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-lightbulb"></i>
+            </div>
+            <div class="stat-number">{{ total_ideas|default:"0" }}</div>
+            <div class="stat-label">Content Ideas</div>
+            <div class="mt-2">
+                <span class="badge bg-success">+47% this month</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-pen-fancy"></i>
+            </div>
+            <div class="stat-number">{{ total_captions|default:"0" }}</div>
+            <div class="stat-label">Captions Generated</div>
+            <div class="mt-2">
+                <span class="badge bg-success">+82% this month</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-number">{{ published_count|default:"0" }}</div>
+            <div class="stat-label">Published Posts</div>
+            <div class="mt-2">
+                <span class="badge bg-success">+156 this week</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number">50%</div>
+            <div class="stat-label">Time Saved</div>
+            <div class="mt-2">
+                <span class="badge bg-primary">Avg. 4hrs/day</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Ideas Section -->
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Recent Content Ideas</h2>
+            <a href="{% url 'generate_ideas' %}" class="btn btn-modern btn-primary-modern">
+                <i class="fas fa-plus-circle me-2"></i>Generate New Ideas
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            {% if recent_ideas %}
+                {% for idea in recent_ideas %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="modern-card">
+                        {% if forloop.first %}
+                        <div class="card-badge">
+                            <i class="fas fa-fire me-1"></i>Trending
+                        </div>
+                        {% endif %}
+                        
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span><i class="fas fa-tag"></i>{{ idea.get_category_display }}</span>
+                                <span><i class="fas fa-globe"></i>{{ idea.get_platform_display }}</span>
+                            </div>
+                            
+                            <h3 class="card-title">{{ idea.title }}</h3>
+                            
+                            <p class="text-muted mb-3">{{ idea.angle|truncatechars:80 }}</p>
+                            
+                            <!-- Engagement Preview -->
+                            <div class="d-flex gap-3 text-muted small mb-3">
+                                <span><i class="far fa-heart"></i> 234</span>
+                                <span><i class="far fa-comment"></i> 45</span>
+                                <span><i class="far fa-share-square"></i> 12</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <span class="text-primary fw-bold">
+                                <i class="far fa-clock me-1"></i>{{ idea.created_at|timesince }} ago
+                            </span>
+                            <a href="{% url 'generate_caption' idea.id %}" class="btn btn-sm btn-primary-modern">
+                                Write Caption <i class="fas fa-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="modern-card text-center py-5">
+                        <i class="fas fa-lightbulb fa-4x text-muted mb-3"></i>
+                        <h4>No ideas yet</h4>
+                        <p class="text-muted mb-4">Start your content journey by generating some amazing ideas!</p>
+                        <a href="{% url 'generate_ideas' %}" class="btn btn-modern btn-primary-modern">
+                            <i class="fas fa-magic me-2"></i>Generate Your First Idea
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Upcoming Posts Section -->
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Content Calendar</h2>
+            <a href="{% url 'calendar_view' %}" class="btn btn-modern btn-outline-modern">
+                <i class="fas fa-calendar-alt me-2"></i>View Full Calendar
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            {% if upcoming_posts %}
+                {% for post in upcoming_posts %}
+                <div class="col-md-6">
+                    <div class="modern-card d-flex flex-column h-100">
+                        <div class="card-content flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-{% if post.platform == 'linkedin' %}primary{% elif post.platform == 'instagram' %}danger{% elif post.platform == 'twitter' %}info{% else %}secondary{% endif %} rounded-pill px-3 py-2">
+                                    <i class="fab fa-{{ post.platform }} me-2"></i>{{ post.get_platform_display }}
+                                </span>
+                                <span class="badge bg-{% if post.content.status == 'approved' %}success{% elif post.content.status == 'draft' %}warning{% else %}secondary{% endif %}">
+                                    {{ post.content.get_status_display }}
+                                </span>
+                            </div>
+                            
+                            <h4 class="card-title h5">{{ post.content.idea.title }}</h4>
+                            
+                            <!-- Countdown Timer -->
+                            <div class="bg-light rounded-3 p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Scheduled for:</small>
+                                    <div class="countdown-timer" data-date="{{ post.scheduled_date|date:'Y-m-d' }}" data-time="{{ post.scheduled_time|time:'H:i' }}">
+                                        <span class="fw-bold text-primary days">0</span>d 
+                                        <span class="fw-bold text-primary hours">0</span>h 
+                                        <span class="fw-bold text-primary minutes">0</span>m
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Preview -->
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-quote-left me-1 text-primary"></i>
+                                {{ post.content.caption|truncatechars:100 }}
+                            </p>
+                        </div>
+                        
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="far fa-calendar me-1"></i>{{ post.scheduled_date|date:"M d, Y" }}
+                                    <i class="far fa-clock ms-2 me-1"></i>{{ post.scheduled_time|time:"g:i A" }}
+                                </small>
+                                <a href="{% url 'content_detail' post.content.id %}" class="btn btn-sm btn-link text-primary">
+                                    Details <i class="fas fa-chevron-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="modern-card text-center py-5">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                        <h4>No scheduled posts</h4>
+                        <p class="text-muted mb-4">Plan your content strategy and schedule your first post!</p>
+                        <a href="{% url 'saved_content' %}" class="btn btn-modern btn-primary-modern">
+                            <i class="fas fa-calendar-plus me-2"></i>Schedule Content
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="steps-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">How It Works</h2>
+            <p class="lead text-muted">Three simple steps to create amazing content</p>
+        </div>
+        
+        <div class="row g-5">
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3 class="step-title">Generate Ideas</h3>
+                    <p class="step-description">
+                        Enter your topic and let AI generate dozens of engaging content ideas tailored to your audience and brand voice.
+                    </p>
+                    
+                    <!-- Feature List -->
+                    <ul class="list-unstyled mt-4 text-start">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>AI-powered suggestions</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Platform optimization</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Trending topics</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="fas fa-pen-fancy"></i>
+                    </div>
+                    <h3 class="step-title">Write Captions</h3>
+                    <p class="step-description">
+                        Transform ideas into compelling captions optimized for each social platform with the perfect tone and hashtags.
+                    </p>
+                    
+                    <!-- Feature List -->
+                    <ul class="list-unstyled mt-4 text-start">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Multiple tone options</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Smart hashtags</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Quality scoring</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 class="step-title">Schedule & Publish</h3>
+                    <p class="step-description">
+                        Plan your content calendar and schedule posts at the best times for maximum engagement on each platform.
+                    </p>
+                    
+                    <!-- Feature List -->
+                    <ul class="list-unstyled mt-4 text-start">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Best time suggestions</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Visual calendar</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Analytics tracking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CTA Banner -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="modern-card bg-primary text-white p-5 text-center" style="background: var(--primary-gradient);">
+                    <h3 class="mb-3">Ready to transform your content creation?</h3>
+                    <p class="mb-4 opacity-75">Join thousands of creators who are saving time with AI</p>
+                    <a href="{% url 'generate_ideas' %}" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-rocket me-2"></i>Get Started Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Countdown Timer Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize countdown timers
+    document.querySelectorAll('.countdown-timer').forEach(timer => {
+        const dateStr = timer.dataset.date;
+        const timeStr = timer.dataset.time;
+        const scheduledTime = new Date(`${dateStr}T${timeStr}`);
+        
+        function updateCountdown() {
+            const now = new Date();
+            const diff = scheduledTime - now;
+            
+            if (diff > 0) {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                timer.querySelector('.days').textContent = days;
+                timer.querySelector('.hours').textContent = hours;
+                timer.querySelector('.minutes').textContent = minutes;
+            } else {
+                timer.innerHTML = '<span class="text-success">Ready to post!</span>';
+            }
+        }
+        
+        updateCountdown();
+        setInterval(updateCountdown, 60000); // Update every minute
+    });
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Intersection Observer for animations
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+document.querySelectorAll('.stat-card, .modern-card, .step-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'all 0.6s ease';
+    observer.observe(el);
+});
+</script>
+{% endblock %}

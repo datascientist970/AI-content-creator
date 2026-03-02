@@ -1,0 +1,798 @@
+{% extends 'content/base.html' %}
+
+{% block title %}Write Caption{% endblock %}
+
+{% block extra_css %}
+<style>
+    .platform-preview {
+        border-left: 4px solid;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .platform-preview.linkedin {
+        border-left-color: #0077b5;
+        background-color: #f0f9ff;
+    }
+    
+    .platform-preview.instagram {
+        border-left-color: #e4405f;
+        background-color: #fff0f3;
+    }
+    
+    .platform-preview.twitter {
+        border-left-color: #1da1f2;
+        background-color: #f0f9ff;
+    }
+    
+    .platform-preview.facebook {
+        border-left-color: #1877f2;
+        background-color: #f0f8ff;
+    }
+    
+    .platform-preview.tiktok {
+        border-left-color: #000000;
+        background-color: #f8f9fa;
+    }
+    
+    .character-count {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+    
+    .character-count.warning {
+        color: #ffc107;
+    }
+    
+    .character-count.danger {
+        color: #dc3545;
+    }
+    
+    .hashtag-suggestion {
+        display: inline-block;
+        background: #e9ecef;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        margin: 0.25rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    
+    .hashtag-suggestion:hover {
+        background: #0d6efd;
+        color: white;
+    }
+    
+    .generation-options {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .tone-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        margin: 0.25rem;
+        border: 2px solid transparent;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .tone-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    .tone-badge.professional {
+        background: #0d6efd;
+        color: white;
+    }
+    
+    .tone-badge.casual {
+        background: #20c997;
+        color: white;
+    }
+    
+    .tone-badge.witty {
+        background: #fd7e14;
+        color: white;
+    }
+    
+    .tone-badge.inspirational {
+        background: #d63384;
+        color: white;
+    }
+    
+    .tone-badge.educational {
+        background: #198754;
+        color: white;
+    }
+    
+    .tone-badge.selected {
+        border: 2px solid #ffc107;
+        transform: scale(1.05);
+    }
+    
+    .suggestion-pill {
+        display: inline-flex;
+        align-items: center;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 30px;
+        padding: 0.25rem 1rem 0.25rem 0.5rem;
+        margin: 0.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .suggestion-pill i {
+        margin-right: 0.25rem;
+        color: #0d6efd;
+    }
+    
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.9);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    
+    .loading-overlay.show {
+        display: flex;
+    }
+    
+    .loading-content {
+        text-align: center;
+    }
+    
+    .loading-content .spinner {
+        width: 4rem;
+        height: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .version-history {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .version-item {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .version-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .version-item.active {
+        background-color: #e7f3ff;
+        border-left: 3px solid #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner-border text-primary spinner" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h5 class="mt-3">Generating your caption...</h5>
+            <p class="text-muted">AI is crafting the perfect message</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Input Form -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm sticky-top" style="top: 20px; z-index: 100;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-pen-fancy me-2"></i>Write Caption</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Generation Options -->
+                    <div class="generation-options mb-4">
+                        <h6 class="text-white mb-3"><i class="fas fa-magic me-2"></i>Quick Tone Selector</h6>
+                        <div class="d-flex flex-wrap">
+                            <span class="tone-badge professional selected" data-tone="professional" onclick="selectTone('professional')">
+                                <i class="fas fa-briefcase me-1"></i>Professional
+                            </span>
+                            <span class="tone-badge casual" data-tone="casual" onclick="selectTone('casual')">
+                                <i class="fas fa-smile me-1"></i>Casual
+                            </span>
+                            <span class="tone-badge witty" data-tone="witty" onclick="selectTone('witty')">
+                                <i class="fas fa-laugh-squint me-1"></i>Witty
+                            </span>
+                            <span class="tone-badge inspirational" data-tone="inspirational" onclick="selectTone('inspirational')">
+                                <i class="fas fa-star me-1"></i>Inspirational
+                            </span>
+                            <span class="tone-badge educational" data-tone="educational" onclick="selectTone('educational')">
+                                <i class="fas fa-graduation-cap me-1"></i>Educational
+                            </span>
+                        </div>
+                    </div>
+
+                    <form method="post" id="captionForm">
+                        {% csrf_token %}
+                        {{ form.idea_id }}
+                        
+                        <!-- Topic (Read-only) -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Content Topic</label>
+                            {{ form.topic }}
+                            <small class="text-muted">This is the idea you're writing a caption for</small>
+                        </div>
+
+                        <!-- Platform Selection -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Platform</label>
+                            {{ form.platform }}
+                            <div id="platform-help" class="form-text"></div>
+                        </div>
+
+                        <!-- Tone Selection -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tone of Voice</label>
+                            {{ form.tone }}
+                        </div>
+
+                        <!-- Additional Instructions -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Additional Instructions</label>
+                            {{ form.additional_instructions }}
+                            <small class="text-muted">
+                                <i class="fas fa-lightbulb me-1"></i>
+                                Examples: "Include a statistic", "Mention our new feature", "Make it funny"
+                            </small>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                                <i class="fas fa-robot me-2"></i>Generate Caption
+                            </button>
+                            
+                            <button type="button" class="btn btn-outline-secondary" onclick="regenerateWithVariation()">
+                                <i class="fas fa-sync-alt me-2"></i>Generate Different Version
+                            </button>
+                            
+                            {% if idea %}
+                            <a href="{% url 'generate_ideas' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Ideas
+                            </a>
+                            {% endif %}
+                        </div>
+                    </form>
+
+                    <!-- Platform Guidelines -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2 text-info"></i>Platform Guidelines</h6>
+                        <div id="platformGuidelines">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                        
+                        <!-- Character Limits -->
+                        <div class="mt-3">
+                            <small class="text-muted d-block">
+                                <i class="fas fa-text-height me-1"></i>Character Limits:
+                            </small>
+                            <small class="text-muted d-block">LinkedIn: 3000 | Instagram: 2200 | Twitter: 280 | Facebook: 63206</small>
+                        </div>
+                    </div>
+
+                    <!-- Quick Tips -->
+                    <div class="mt-3">
+                        <div class="accordion" id="tipsAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tipsCollapse">
+                                        <i class="fas fa-lightbulb text-warning me-2"></i>Writing Tips
+                                    </button>
+                                </h2>
+                                <div id="tipsCollapse" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                                    <div class="accordion-body">
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Start with a hook in first 2 lines</li>
+                                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Keep paragraphs short (2-3 sentences)</li>
+                                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Use emojis sparingly and relevantly</li>
+                                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>End with a question to drive engagement</li>
+                                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Include 3-5 relevant hashtags</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Generated Caption -->
+        <div class="col-lg-7">
+            {% if generated_content %}
+            <!-- Generated Caption Display -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Generated Caption
+                    </h5>
+                    <div>
+                        <span class="badge bg-primary me-2">{{ generated_content.idea.get_platform_display }}</span>
+                        <span class="badge bg-info">{{ generated_content.word_count }} words</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Quality Score -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold">Quality Score</span>
+                            <span class="{% if generated_content.quality_score >= 0.8 %}quality-high{% elif generated_content.quality_score >= 0.6 %}quality-medium{% else %}quality-low{% endif %}">
+                                {{ generated_content.quality_score|floatformat:2 }} / 1.0
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar {% if generated_content.quality_score >= 0.8 %}bg-success{% elif generated_content.quality_score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {% widthratio generated_content.quality_score 1 100 %}%">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Platform Preview -->
+                    <div class="platform-preview {{ generated_content.idea.platform }} mb-3">
+                        <small class="text-muted d-block mb-2">Preview for {{ generated_content.idea.get_platform_display }}</small>
+                        <div class="caption-content">
+                            {{ generated_content.caption|linebreaks }}
+                        </div>
+                        {% if generated_content.hashtags %}
+                        <div class="hashtags mt-2 text-primary">
+                            {{ generated_content.hashtags }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Character Count -->
+                    <div class="character-count mb-3">
+                        <i class="fas fa-ruler me-1"></i>
+                        <span id="charCount">{{ generated_content.caption|length }}</span> characters
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-success" onclick="copyCaption()">
+                            <i class="fas fa-copy me-2"></i>Copy Caption
+                        </button>
+                        
+                        <button class="btn btn-primary" onclick="regenerateWithVariation()">
+                            <i class="fas fa-sync-alt me-2"></i>Regenerate
+                        </button>
+                        
+                        <a href="{% url 'content_detail' generated_content.id %}" class="btn btn-info text-white">
+                            <i class="fas fa-chart-line me-2"></i>View Details
+                        </a>
+                        
+                        {% if generated_content.status != 'approved' %}
+                        <form method="post" action="{% url 'content_detail' generated_content.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="fas fa-check me-2"></i>Approve
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        <a href="{% url 'schedule_content' generated_content.id %}" class="btn btn-warning">
+                            <i class="fas fa-calendar-plus me-2"></i>Schedule
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quality Checks -->
+            {% with quality_check=generated_content.quality_checks.first %}
+                {% if quality_check %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0"><i class="fas fa-clipboard-check text-info me-2"></i>Quality Analysis</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">Issues Found:</h6>
+                                <ul class="list-unstyled">
+                                    {% for issue in quality_check.issues_list %}
+                                    <li class="text-danger mb-2">
+                                        <i class="fas fa-exclamation-circle me-2"></i>{{ issue }}
+                                    </li>
+                                    {% empty %}
+                                    <li class="text-success">
+                                        <i class="fas fa-check-circle me-2"></i>No major issues found
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">Suggestions:</h6>
+                                <ul class="list-unstyled">
+                                    {% for suggestion in quality_check.suggestions_list %}
+                                    <li class="text-info mb-2">
+                                        <i class="fas fa-lightbulb me-2"></i>{{ suggestion }}
+                                    </li>
+                                    {% empty %}
+                                    <li class="text-muted">No suggestions available</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Hashtag Suggestions -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="fas fa-hashtag text-primary me-2"></i>Suggested Hashtags</h6>
+                </div>
+                <div class="card-body">
+                    <div class="hashtag-suggestions" id="hashtagSuggestions">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="refreshHashtags()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- No Caption Yet -->
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-pen-fancy fa-4x text-muted mb-3"></i>
+                    <h5>Ready to write a caption?</h5>
+                    <p class="text-muted mb-4">Fill out the form and click "Generate Caption" to create an AI-powered caption for your content idea.</p>
+                    
+                    {% if idea %}
+                    <div class="alert alert-info text-start">
+                        <h6 class="fw-bold">Content Idea:</h6>
+                        <p class="mb-2">{{ idea.title }}</p>
+                        <small>Category: {{ idea.get_category_display }} | Platform: {{ idea.get_platform_display }}</small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <i class="fas fa-bolt text-warning mb-2"></i>
+                                    <h6>Quick Generation</h6>
+                                    <p class="small text-muted">Generate a caption in seconds with AI</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <i class="fas fa-magic text-primary mb-2"></i>
+                                    <h6>Smart Suggestions</h6>
+                                    <p class="small text-muted">Get hashtag and tone recommendations</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Template for copy success message -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11" id="copyToast">
+    <div class="toast hide" role="alert">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Success</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body">
+            Caption copied to clipboard!
+        </div>
+    </div>
+</div>
+
+<script>
+// Platform guidelines
+const platformGuidelines = {
+    'linkedin': {
+        name: 'LinkedIn',
+        icon: 'fab fa-linkedin',
+        color: '#0077b5',
+        tips: [
+            'Professional tone, industry insights',
+            'Long-form content (1500-3000 chars)',
+            'Include data and statistics',
+            'End with thought-provoking question',
+            '3-5 relevant hashtags'
+        ],
+        maxChars: 3000,
+        bestTime: 'Tue-Thu, 8-10 AM'
+    },
+    'instagram': {
+        name: 'Instagram',
+        icon: 'fab fa-instagram',
+        color: '#e4405f',
+        tips: [
+            'Visual-focused, use emojis',
+            'Engaging storytelling',
+            'First 2 lines are crucial',
+            '5-10 relevant hashtags',
+            'Include call-to-action'
+        ],
+        maxChars: 2200,
+        bestTime: 'Mon-Fri, 11 AM-2 PM'
+    },
+    'twitter': {
+        name: 'Twitter',
+        icon: 'fab fa-twitter',
+        color: '#1da1f2',
+        tips: [
+            'Concise and punchy',
+            'Stay under 280 characters',
+            'Use 1-2 hashtags max',
+            'Start conversations',
+            'Include media if possible'
+        ],
+        maxChars: 280,
+        bestTime: 'Mon-Fri, 9 AM-4 PM'
+    },
+    'facebook': {
+        name: 'Facebook',
+        icon: 'fab fa-facebook',
+        color: '#1877f2',
+        tips: [
+            'Community-focused',
+            'Storytelling approach',
+            'Encourage comments',
+            '2-3 relevant hashtags',
+            'Can be longer format'
+        ],
+        maxChars: 63206,
+        bestTime: 'Wed-Thu, 1-3 PM'
+    },
+    'tiktok': {
+        name: 'TikTok',
+        icon: 'fab fa-tiktok',
+        color: '#000000',
+        tips: [
+            'Trendy and energetic',
+            'Short and snappy',
+            'Minimal text, more visual',
+            'Use trending sounds',
+            '1-2 hashtags max'
+        ],
+        maxChars: 150,
+        bestTime: 'Tue-Thu, 6-10 PM'
+    }
+};
+
+// Character limits per platform
+const charLimits = {
+    'linkedin': 3000,
+    'instagram': 2200,
+    'twitter': 280,
+    'facebook': 63206,
+    'tiktok': 150
+};
+
+// Select tone
+function selectTone(tone) {
+    // Update UI
+    document.querySelectorAll('.tone-badge').forEach(badge => {
+        badge.classList.remove('selected');
+    });
+    document.querySelector(`.tone-badge.${tone}`).classList.add('selected');
+    
+    // Update form field
+    document.getElementById('id_tone').value = tone;
+}
+
+// Update platform guidelines
+function updatePlatformGuidelines(platform) {
+    const guidelines = platformGuidelines[platform] || platformGuidelines['linkedin'];
+    const container = document.getElementById('platformGuidelines');
+    const helpText = document.getElementById('platform-help');
+    
+    if (guidelines) {
+        let html = `
+            <div class="d-flex align-items-center mb-2">
+                <i class="${guidelines.icon} me-2" style="color: ${guidelines.color}; font-size: 1.2rem;"></i>
+                <span class="fw-bold">${guidelines.name} Tips:</span>
+            </div>
+            <ul class="list-unstyled small">
+        `;
+        
+        guidelines.tips.forEach(tip => {
+            html += `<li class="mb-1"><i class="fas fa-check-circle me-2 text-success" style="font-size: 0.8rem;"></i>${tip}</li>`;
+        });
+        
+        html += `</ul>`;
+        html += `<small class="text-muted d-block mt-2"><i class="fas fa-clock me-1"></i>Best time: ${guidelines.bestTime}</small>`;
+        
+        container.innerHTML = html;
+        
+        if (helpText) {
+            helpText.innerHTML = `<i class="fas fa-info-circle me-1"></i>Max ${guidelines.maxChars} characters for ${guidelines.name}`;
+        }
+    }
+}
+
+// Initialize platform selector
+document.addEventListener('DOMContentLoaded', function() {
+    const platformSelect = document.getElementById('id_platform');
+    if (platformSelect) {
+        // Set initial guidelines
+        updatePlatformGuidelines(platformSelect.value);
+        
+        // Update on change
+        platformSelect.addEventListener('change', function() {
+            updatePlatformGuidelines(this.value);
+        });
+    }
+    
+    // Initialize hashtag suggestions if caption exists
+    {% if generated_content %}
+    updateHashtagSuggestions('{{ generated_content.caption|escapejs }}');
+    {% endif %}
+});
+
+// Copy caption
+function copyCaption() {
+    const caption = `{{ generated_content.caption|escapejs }}\n\n{{ generated_content.hashtags|escapejs }}`;
+    
+    navigator.clipboard.writeText(caption).then(function() {
+        const toastEl = document.querySelector('#copyToast .toast');
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    });
+}
+
+// Regenerate with variation
+function regenerateWithVariation() {
+    const form = document.getElementById('captionForm');
+    const instructions = document.getElementById('id_additional_instructions');
+    
+    // Add variation instruction
+    const currentValue = instructions.value;
+    instructions.value = currentValue + ' (Create a different variation with unique angle)';
+    
+    // Show loading
+    document.getElementById('loadingOverlay').classList.add('show');
+    
+    // Submit form
+    form.submit();
+}
+
+// Update character count
+function updateCharCount(text, platform) {
+    const count = text.length;
+    const limit = charLimits[platform] || 2200;
+    const countElement = document.getElementById('charCount');
+    
+    if (countElement) {
+        countElement.textContent = count;
+        countElement.className = '';
+        
+        if (count > limit) {
+            countElement.classList.add('danger');
+        } else if (count > limit * 0.9) {
+            countElement.classList.add('warning');
+        }
+    }
+}
+
+// Generate hashtag suggestions
+function updateHashtagSuggestions(caption) {
+    const container = document.getElementById('hashtagSuggestions');
+    if (!container) return;
+    
+    // Extract keywords from caption (simple version)
+    const words = caption.toLowerCase().split(/\W+/);
+    const keywords = [...new Set(words)].filter(word => word.length > 3).slice(0, 5);
+    
+    // Generate hashtags
+    const hashtags = keywords.map(word => `#${word}`);
+    
+    // Add platform specific
+    const platform = '{{ generated_content.idea.platform|default:"linkedin" }}';
+    const platformHashtags = {
+        'linkedin': ['#marketing', '#business', '#success', '#innovation'],
+        'instagram': ['#instagood', '#photooftheday', '#love', '#fashion'],
+        'twitter': ['#trending', '#viral', '#news', '#tech'],
+        'facebook': ['#facebook', '#socialmedia', '#community', '#share'],
+        'tiktok': ['#fyp', '#foryou', '#viral', '#trending']
+    };
+    
+    const suggestions = [...hashtags, ...(platformHashtags[platform] || [])].slice(0, 10);
+    
+    // Display
+    container.innerHTML = suggestions.map(tag => 
+        `<span class="hashtag-suggestion" onclick="addHashtag('${tag}')">${tag}</span>`
+    ).join('');
+}
+
+// Add hashtag to caption
+function addHashtag(hashtag) {
+    const captionElement = document.querySelector('.caption-content');
+    if (captionElement) {
+        const currentText = captionElement.innerText;
+        if (!currentText.includes(hashtag)) {
+            captionElement.innerText = currentText + ' ' + hashtag;
+        }
+    }
+}
+
+// Refresh hashtags
+function refreshHashtags() {
+    {% if generated_content %}
+    updateHashtagSuggestions('{{ generated_content.caption|escapejs }}');
+    {% endif %}
+}
+
+// Show loading on form submit
+document.getElementById('captionForm')?.addEventListener('submit', function() {
+    document.getElementById('loadingOverlay').classList.add('show');
+});
+
+// Auto-save draft
+let autoSaveTimer;
+document.getElementById('id_additional_instructions')?.addEventListener('input', function() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(function() {
+        const data = {
+            instructions: document.getElementById('id_additional_instructions').value,
+            platform: document.getElementById('id_platform').value,
+            tone: document.getElementById('id_tone').value
+        };
+        localStorage.setItem('captionDraft', JSON.stringify(data));
+        
+        // Show saved indicator
+        const indicator = document.createElement('small');
+        indicator.className = 'text-success float-end';
+        indicator.innerHTML = '<i class="fas fa-check me-1"></i>Draft saved';
+        document.querySelector('.mb-3 .form-text').appendChild(indicator);
+        setTimeout(() => indicator.remove(), 2000);
+    }, 2000);
+});
+
+// Load draft if exists
+window.addEventListener('load', function() {
+    const draft = localStorage.getItem('captionDraft');
+    if (draft) {
+        const data = JSON.parse(draft);
+        if (confirm('Found a saved draft. Would you like to restore it?')) {
+            document.getElementById('id_additional_instructions').value = data.instructions;
+            document.getElementById('id_platform').value = data.platform;
+            document.getElementById('id_tone').value = data.tone;
+            selectTone(data.tone);
+            updatePlatformGuidelines(data.platform);
+        } else {
+            localStorage.removeItem('captionDraft');
+        }
+    }
+});
+</script>
+{% endblock %}

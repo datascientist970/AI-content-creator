@@ -1,0 +1,88 @@
+/* Custom styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Card hover effects */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+/* Custom badges */
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+}
+
+/* Loading spinner */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-overlay.show {
+    display: flex;
+}
+
+/* Calendar styles */
+.calendar-day {
+    min-height: 120px;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+}
+
+.calendar-day.today {
+    background-color: #f8f9fa;
+    border: 2px solid #0d6efd;
+}
+
+/* Platform colors */
+.platform-linkedin { color: #0077b5; }
+.platform-instagram { color: #e4405f; }
+.platform-twitter { color: #1da1f2; }
+.platform-facebook { color: #1877f2; }
+.platform-tiktok { color: #000000; }
+
+/* Quality score */
+.quality-high {
+    color: #198754;
+    font-weight: bold;
+}
+
+.quality-medium {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+.quality-low {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Caption preview */
+.caption-preview {
+    background-color: #f8f9fa;
+    border-left: 4px solid #0d6efd;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+}

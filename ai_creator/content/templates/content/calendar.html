@@ -1,0 +1,388 @@
+{% extends 'content/base.html' %}
+
+{% block title %}Content Calendar{% endblock %}
+
+{% block extra_css %}
+<style>
+.calendar-wrapper {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.calendar-header {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px 10px 0 0;
+    border-bottom: 2px solid #dee2e6;
+}
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #e9ecef;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #dee2e6;
+    padding: 1px;
+}
+.calendar-day {
+    background: white;
+    min-height: 120px;
+    padding: 10px;
+    position: relative;
+}
+.calendar-day.today {
+    background: #e7f3ff;
+    border: 2px solid #0d6efd;
+}
+.calendar-day.other-month {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+.day-number {
+    font-weight: bold;
+    margin-bottom: 5px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #dee2e6;
+}
+.calendar-event {
+    background: #e7f3ff;
+    border-left: 3px solid #0d6efd;
+    padding: 3px 5px;
+    margin-bottom: 3px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 0 3px 3px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.calendar-event:hover {
+    background: #cfe2ff;
+}
+.calendar-event.linkedin { border-left-color: #0077b5; }
+.calendar-event.instagram { border-left-color: #e4405f; }
+.calendar-event.twitter { border-left-color: #1da1f2; }
+.calendar-event.facebook { border-left-color: #1877f2; }
+.calendar-event.tiktok { border-left-color: #000000; }
+.calendar-legend {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+}
+.legend-color {
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold"><i class="fas fa-calendar-alt me-2 text-primary"></i>Content Calendar</h2>
+            <p class="text-muted">Plan and schedule your social media content</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <button class="btn btn-outline-primary" onclick="changeMonth(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn btn-outline-primary" onclick="changeMonth(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <a href="{% url 'saved_content' %}?status=approved" class="btn btn-success ms-2">
+                <i class="fas fa-plus-circle me-2"></i>Schedule Content
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ request.GET.start_date }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ request.GET.end_date }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="platform" class="form-label">Platform</label>
+                    <select name="platform" id="platform" class="form-select">
+                        <option value="">All Platforms</option>
+                        {% for value, label in platform_choices %}
+                        <option value="{{ value }}" {% if request.GET.platform == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Status</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-2"></i>Apply Filters
+                    </button>
+                    <a href="{% url 'calendar_view' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="calendar-legend">
+                <span class="legend-item"><span class="legend-color" style="background: #0d6efd;"></span> LinkedIn</span>
+                <span class="legend-item"><span class="legend-color" style="background: #e4405f;"></span> Instagram</span>
+                <span class="legend-item"><span class="legend-color" style="background: #1da1f2;"></span> Twitter</span>
+                <span class="legend-item"><span class="legend-color" style="background: #1877f2;"></span> Facebook</span>
+                <span class="legend-item"><span class="legend-color" style="background: #000000;"></span> TikTok</span>
+                <span class="legend-item"><span class="badge bg-success">✓</span> Posted</span>
+                <span class="legend-item"><span class="badge bg-warning">⏳</span> Scheduled</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="calendar-wrapper">
+        <!-- Month Header -->
+        <div class="calendar-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">{{ month_name }} {{ year }}</h4>
+            <div class="btn-group">
+                <a href="?month={{ prev_month }}&year={{ prev_year }}{% if request.GET.platform %}&platform={{ request.GET.platform }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+                <a href="?month={{ next_month }}&year={{ next_year }}{% if request.GET.platform %}&platform={{ request.GET.platform }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="btn btn-sm btn-outline-primary">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Weekdays -->
+        <div class="calendar-weekdays">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+        </div>
+
+        <!-- Calendar Days -->
+        <div class="calendar-grid">
+            {% for week in calendar_days %}
+                {% for day in week %}
+                <div class="calendar-day {% if day.is_today %}today{% endif %} {% if not day.is_current_month %}other-month{% endif %}">
+                    <div class="day-number">{{ day.day }}</div>
+                    
+                    {% for entry in day.entries %}
+                    <div class="calendar-event {{ entry.platform }}" 
+                         onclick="showEventDetails('{{ entry.content.idea.title|escapejs }}', '{{ entry.platform }}', '{{ entry.scheduled_time|time:"g:i A" }}', '{{ entry.content.caption|escapejs }}', '{{ entry.content.status }}')"
+                         data-bs-toggle="tooltip" 
+                         title="{{ entry.content.idea.title }}">
+                        <i class="fab fa-{{ entry.platform }} me-1"></i>
+                        <span class="small">{{ entry.content.idea.title|truncatechars:15 }}</span>
+                        {% if entry.is_posted %}
+                        <i class="fas fa-check-circle text-success ms-1"></i>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                        {% if day.is_current_month %}
+                        <div class="text-muted small text-center mt-2">-</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Upcoming Schedule -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2 text-warning"></i>Upcoming Posts</h5>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_entries %}
+                    <div class="list-group">
+                        {% for entry in upcoming_entries %}
+                        <div class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ entry.content.idea.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fab fa-{{ entry.platform }} me-1"></i>{{ entry.get_platform_display }}
+                                        <i class="fas fa-calendar ms-2 me-1"></i>{{ entry.scheduled_date|date:"M d, Y" }}
+                                        <i class="fas fa-clock ms-2 me-1"></i>{{ entry.scheduled_time|time:"g:i A" }}
+                                    </small>
+                                </div>
+                                <a href="{% url 'content_detail' entry.content.id %}" class="btn btn-sm btn-outline-primary">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No upcoming posts scheduled</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-check-circle me-2 text-success"></i>Recently Posted</h5>
+                </div>
+                <div class="card-body">
+                    {% if posted_entries %}
+                    <div class="list-group">
+                        {% for entry in posted_entries %}
+                        <div class="list-group-item list-group-item-action">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ entry.content.idea.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fab fa-{{ entry.platform }} me-1"></i>{{ entry.get_platform_display }}
+                                        <i class="fas fa-calendar-check ms-2 me-1"></i>{{ entry.posted_at|date:"M d, Y" }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-success">Posted</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No posts published yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Event Details Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Post Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="modalTitle" class="fw-bold mb-3"></h6>
+                
+                <div class="mb-3">
+                    <span id="modalPlatform" class="badge bg-primary me-2"></span>
+                    <span id="modalTime" class="badge bg-secondary"></span>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Caption:</label>
+                    <div id="modalCaption" class="p-3 bg-light rounded" style="max-height: 200px; overflow-y: auto;"></div>
+                </div>
+                
+                <div id="modalStatus" class="alert alert-info mb-0"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" id="modalViewLink" class="btn btn-primary">View Full Content</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showEventDetails(title, platform, time, caption, status) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalPlatform').textContent = platform.charAt(0).toUpperCase() + platform.slice(1);
+    document.getElementById('modalTime').textContent = time;
+    document.getElementById('modalCaption').textContent = caption;
+    
+    let statusText = '';
+    let statusClass = '';
+    if (status === 'published') {
+        statusText = 'This post has been published';
+        statusClass = 'alert-success';
+    } else if (status === 'scheduled') {
+        statusText = 'This post is scheduled';
+        statusClass = 'alert-info';
+    } else {
+        statusText = 'Status: ' + status;
+        statusClass = 'alert-warning';
+    }
+    
+    const statusEl = document.getElementById('modalStatus');
+    statusEl.textContent = statusText;
+    statusEl.className = 'alert ' + statusClass + ' mb-0';
+    
+    // You might want to set the view link dynamically
+    // document.getElementById('modalViewLink').href = '/content/' + contentId;
+    
+    new bootstrap.Modal(document.getElementById('eventModal')).show();
+}
+
+function changeMonth(delta) {
+    const url = new URL(window.location.href);
+    let month = parseInt(url.searchParams.get('month') || {{ month }});
+    let year = parseInt(url.searchParams.get('year') || {{ year }});
+    
+    month += delta;
+    if (month < 1) {
+        month = 12;
+        year -= 1;
+    } else if (month > 12) {
+        month = 1;
+        year += 1;
+    }
+    
+    url.searchParams.set('month', month);
+    url.searchParams.set('year', year);
+    window.location.href = url.toString();
+}
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

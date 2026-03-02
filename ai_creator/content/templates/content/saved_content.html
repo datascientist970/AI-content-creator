@@ -1,0 +1,287 @@
+{% extends 'content/base.html' %}
+
+{% block title %}Saved Content{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="fw-bold"><i class="fas fa-save me-2 text-primary"></i>Saved Content</h2>
+            <p class="text-muted">Manage and review all your generated content</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'generate_ideas' %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-2"></i>Create New
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">All Status</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="platform" class="form-label">Platform</label>
+                    <select name="platform" id="platform" class="form-select">
+                        <option value="">All Platforms</option>
+                        {% for value, label in platform_choices %}
+                        <option value="{{ value }}" {% if platform_filter == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-filter me-2"></i>Apply Filters
+                    </button>
+                    <a href="{% url 'saved_content' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Content Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Total Content</h6>
+                            <h3 class="mt-2 mb-0">{{ contents.count }}</h3>
+                        </div>
+                        <i class="fas fa-file-alt fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Approved</h6>
+                            <h3 class="mt-2 mb-0">{{ contents.approved.count }}</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">In Review</h6>
+                            <h3 class="mt-2 mb-0">{{ contents.review.count }}</h3>
+                        </div>
+                        <i class="fas fa-clock fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Published</h6>
+                            <h3 class="mt-2 mb-0">{{ contents.published.count }}</h3>
+                        </div>
+                        <i class="fas fa-globe fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content List -->
+    {% if contents %}
+    <div class="row">
+        {% for content in contents %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm hover-shadow">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge {% if content.status == 'approved' %}bg-success{% elif content.status == 'review' %}bg-warning{% elif content.status == 'published' %}bg-info{% elif content.status == 'rejected' %}bg-danger{% else %}bg-secondary{% endif %} me-2">
+                            {{ content.get_status_display }}
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fab fa-{{ content.idea.platform }} me-1"></i>{{ content.idea.get_platform_display }}
+                        </span>
+                    </div>
+                    <small class="text-muted">{{ content.created_at|date:"M d, Y" }}</small>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-3">{{ content.idea.title }}</h6>
+                    
+                    <!-- Caption Preview -->
+                    <div class="caption-preview mb-3 p-3 bg-light rounded">
+                        <p class="mb-2">{{ content.caption|truncatechars:150 }}</p>
+                        {% if content.hashtags %}
+                        <small class="text-primary">{{ content.hashtags|truncatechars:50 }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Quality Score -->
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            <span class="fw-bold">Quality:</span>
+                            <span class="{% if content.quality_score >= 0.8 %}quality-high{% elif content.quality_score >= 0.6 %}quality-medium{% else %}quality-low{% endif %}">
+                                {{ content.quality_score|floatformat:2 }}
+                            </span>
+                        </div>
+                        <div class="ms-auto">
+                            <small class="text-muted">{{ content.word_count }} words</small>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress mb-3" style="height: 5px;">
+                        <div class="progress-bar {% if content.quality_score >= 0.8 %}bg-success{% elif content.quality_score >= 0.6 %}bg-warning{% else %}bg-danger{% endif %}" 
+                             role="progressbar" 
+                             style="width: {% widthratio content.quality_score 1 100 %}%">
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'content_detail' content.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye me-1"></i>View Details
+                        </a>
+                        
+                        {% if content.status == 'approved' %}
+                        <a href="{% url 'schedule_content' content.id %}" class="btn btn-sm btn-success">
+                            <i class="fas fa-calendar-plus me-1"></i>Schedule
+                        </a>
+                        {% elif content.status == 'draft' or content.status == 'review' %}
+                        <a href="{% url 'generate_caption' content.idea.id %}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        {% elif content.status == 'published' %}
+                        <button class="btn btn-sm btn-outline-success" disabled>
+                            <i class="fas fa-check me-1"></i>Published
+                        </button>
+                        {% endif %}
+                        
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyContent('{{ content.caption|escapejs }}')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Calendar info if scheduled -->
+                {% with calendar_entry=content.calendar_entries.first %}
+                    {% if calendar_entry %}
+                    <div class="card-footer bg-white border-top">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Scheduled for {{ calendar_entry.scheduled_date|date:"M d, Y" }} at {{ calendar_entry.scheduled_time|time:"g:i A" }}
+                            {% if calendar_entry.is_posted %}
+                            <span class="badge bg-success ms-2">Posted</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if contents.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if contents.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ contents.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if platform_filter %}&platform={{ platform_filter }}{% endif %}">
+                    Previous
+                </a>
+            </li>
+            {% endif %}
+
+            {% for i in contents.paginator.page_range %}
+                {% if contents.number == i %}
+                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ i }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if platform_filter %}&platform={{ platform_filter }}{% endif %}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if contents.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ contents.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if platform_filter %}&platform={{ platform_filter }}{% endif %}">
+                    Next
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <!-- No Content -->
+    <div class="text-center py-5">
+        <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+        <h5>No content found</h5>
+        <p class="text-muted">Start by generating some content ideas and writing captions.</p>
+        <a href="{% url 'generate_ideas' %}" class="btn btn-primary">
+            <i class="fas fa-magic me-2"></i>Generate Ideas
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Copy Function -->
+<script>
+function copyContent(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show toast notification
+        const toast = document.createElement('div');
+        toast.className = 'position-fixed bottom-0 end-0 p-3';
+        toast.style.zIndex = '11';
+        toast.innerHTML = `
+            <div class="toast show" role="alert">
+                <div class="toast-header bg-success text-white">
+                    <strong class="me-auto">Success</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    Content copied to clipboard!
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    });
+}
+</script>
+
+<style>
+.hover-shadow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+    transition: all 0.3s ease;
+}
+.caption-preview {
+    border-left: 4px solid #0d6efd;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}

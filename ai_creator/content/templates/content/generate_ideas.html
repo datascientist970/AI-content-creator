@@ -1,0 +1,843 @@
+{% extends 'content/base.html' %}
+{% load static %}
+
+{% block title %}Generate Content Ideas - AI Content Creator{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Modern CSS Variables */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        --warning-gradient: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+        --glass-bg: rgba(255, 255, 255, 0.95);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+        --shadow-sm: 0 10px 40px rgba(0, 0, 0, 0.08);
+        --shadow-md: 0 20px 60px rgba(0, 0, 0, 0.12);
+        --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.15);
+        --border-radius: 24px;
+        --border-radius-sm: 16px;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+
+    /* Animated Background */
+    .page-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .gradient-sphere {
+        position: absolute;
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+        border-radius: 50%;
+        top: -200px;
+        right: -200px;
+        animation: floatSphere 30s infinite linear;
+    }
+
+    .gradient-sphere-2 {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(240,147,251,0.1) 0%, rgba(245,87,108,0.1) 100%);
+        border-radius: 50%;
+        bottom: -200px;
+        left: -200px;
+        animation: floatSphere 25s infinite reverse;
+    }
+
+    @keyframes floatSphere {
+        0% { transform: rotate(0deg) translateX(50px) rotate(0deg); }
+        100% { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
+    }
+
+    /* Glass Card Effect */
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: var(--glass-border);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Form Card Styling */
+    .form-card {
+        background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        position: sticky;
+        top: 20px;
+        z-index: 100;
+    }
+
+    .form-header {
+        background: var(--primary-gradient);
+        padding: 25px 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+        pointer-events: none;
+    }
+
+    .form-header h5 {
+        margin: 0;
+        color: white;
+        font-weight: 700;
+        font-size: 1.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .form-header i {
+        margin-right: 10px;
+        animation: pulse 2s infinite;
+    }
+
+    .form-body {
+        padding: 30px;
+    }
+
+    /* Modern Form Controls */
+    .modern-input {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .modern-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+        outline: none;
+    }
+
+    .modern-select {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        width: 100%;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236677ee' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        appearance: none;
+    }
+
+    .modern-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+        outline: none;
+    }
+
+    .input-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+        display: block;
+        font-size: 0.95rem;
+    }
+
+    .input-label i {
+        color: #667eea;
+        margin-right: 6px;
+    }
+
+    .input-hint {
+        font-size: 0.85rem;
+        color: #718096;
+        margin-top: 6px;
+        display: block;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 16px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        cursor: pointer;
+    }
+
+    .submit-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .submit-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(102,126,234,0.4);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Ideas Grid */
+    .ideas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .idea-card {
+        background: white;
+        border-radius: var(--border-radius-sm);
+        overflow: hidden;
+        transition: all 0.4s ease;
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+        position: relative;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .idea-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .idea-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--primary-gradient);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .idea-card:hover::before {
+        opacity: 1;
+    }
+
+    .idea-badges {
+        padding: 20px 20px 10px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .category-badge {
+        background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+        color: #667eea;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid #667eea40;
+    }
+
+    .platform-badge {
+        background: linear-gradient(135deg, #f093fb20 0%, #f5576c20 100%);
+        color: #f5576c;
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid #f5576c40;
+    }
+
+    .idea-content {
+        padding: 10px 20px 20px;
+    }
+
+    .idea-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .idea-angle {
+        color: #718096;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .idea-footer {
+        padding: 15px 20px;
+        background: #f8fafc;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .btn-idea-primary {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-idea-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        color: white;
+    }
+
+    .btn-idea-secondary {
+        background: white;
+        color: #4a5568;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-idea-secondary:hover {
+        background: #f7fafc;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Loading Animation */
+    .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: 8px;
+        height: 200px;
+    }
+
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .empty-state-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 30px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #667eea;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Tooltip */
+    .tooltip-icon {
+        position: relative;
+        cursor: help;
+    }
+
+    .tooltip-icon:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #2d3748;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        z-index: 1000;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-card {
+            position: static;
+            margin-bottom: 30px;
+        }
+        
+        .ideas-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Copy Button Animation */
+    .copy-btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .copy-btn.success {
+        background: #10b981;
+        color: white;
+        border-color: #10b981;
+    }
+
+    .copy-btn.success i {
+        animation: bounce 0.5s;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Animated Background -->
+<div class="page-background">
+    <div class="gradient-sphere"></div>
+    <div class="gradient-sphere-2"></div>
+</div>
+
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'index' %}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Generate Ideas</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column - Form -->
+        <div class="col-lg-4">
+            <div class="form-card">
+                <div class="form-header">
+                    <h5><i class="fas fa-magic"></i> Generate Content Ideas</h5>
+                </div>
+                <div class="form-body">
+                    <form method="post" id="ideaForm">
+                        {% csrf_token %}
+                        
+                        <!-- Topic Field -->
+                        <div class="mb-4">
+                            <label class="input-label">
+                                <i class="fas fa-tag"></i>Topic <span class="text-danger">*</span>
+                            </label>
+                            {{ form.topic }}
+                            {% if form.topic.errors %}
+                                <div class="text-danger mt-2">
+                                    {% for error in form.topic.errors %}
+                                        <small><i class="fas fa-exclamation-circle"></i> {{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="input-hint">
+                                <i class="fas fa-info-circle"></i> Main subject for your content
+                            </small>
+                        </div>
+                        
+                        <!-- Niche Field -->
+                        <div class="mb-4">
+                            <label class="input-label">
+                                <i class="fas fa-compass"></i>Niche
+                            </label>
+                            {{ form.niche }}
+                            <small class="input-hint">
+                                <i class="fas fa-lightbulb"></i> e.g., B2B, Fitness, Real Estate (optional)
+                            </small>
+                        </div>
+                        
+                        <!-- Platform and Tone Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="input-label">
+                                    <i class="fas fa-globe"></i>Platform
+                                </label>
+                                {{ form.platform }}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="input-label">
+                                    <i class="fas fa-voice"></i>Tone
+                                </label>
+                                {{ form.tone }}
+                            </div>
+                        </div>
+                        
+                        <!-- Count and Audience Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <label class="input-label">
+                                    <i class="fas fa-hashtag"></i>Number of Ideas
+                                </label>
+                                {{ form.count }}
+                                <small class="input-hint">
+                                    Max 20 ideas per generation
+                                </small>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="input-label">
+                                    <i class="fas fa-users"></i>Target Audience
+                                </label>
+                                {{ form.target_audience }}
+                                <small class="input-hint">
+                                    Who is this content for?
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn" id="generateBtn">
+                            <i class="fas fa-robot me-2"></i>Generate Ideas
+                            <span class="spinner-border spinner-border-sm d-none" id="btnSpinner" role="status"></span>
+                        </button>
+                    </form>
+                    
+                    <!-- Quick Stats -->
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted d-block">Ideas generated today</small>
+                                <strong class="h4 mb-0 text-primary">1,234</strong>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Avg. generation time</small>
+                                <strong class="h4 mb-0 text-success">2.5s</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column - Ideas Display -->
+        <div class="col-lg-8">
+            <div class="glass-card">
+                <div class="card-header bg-transparent border-0 p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            {% if generated %}Generated Ideas{% else %}Content Ideas{% endif %}
+                        </h5>
+                        <small class="text-muted">
+                            {% if ideas %}
+                                {{ ideas|length }} ideas ready for your next post
+                            {% else %}
+                                Start by generating some ideas
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% if ideas %}
+                    <div>
+                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                            <i class="fas fa-magic me-1"></i>{{ ideas|length }} New Ideas
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body p-4">
+                    {% if ideas %}
+                        <div class="ideas-grid">
+                            {% for idea in ideas %}
+                            <div class="idea-card" data-idea-id="{{ idea.id }}">
+                                <div class="idea-badges">
+                                    <span class="category-badge">
+                                        <i class="fas fa-tag me-1"></i>{{ idea.get_category_display }}
+                                    </span>
+                                    <span class="platform-badge">
+                                        <i class="fab fa-{{ idea.platform }} me-1"></i>{{ idea.get_platform_display }}
+                                    </span>
+                                </div>
+                                
+                                <div class="idea-content">
+                                    <h6 class="idea-title">{{ idea.title }}</h6>
+                                    <p class="idea-angle">{{ idea.angle|truncatechars:100 }}</p>
+                                    
+                                    <!-- Engagement Preview -->
+                                    <div class="d-flex gap-3 text-muted small mb-3">
+                                        <span class="tooltip-icon" data-tooltip="Estimated engagement">
+                                            <i class="far fa-heart"></i> 234
+                                        </span>
+                                        <span class="tooltip-icon" data-tooltip="Comments">
+                                            <i class="far fa-comment"></i> 45
+                                        </span>
+                                        <span class="tooltip-icon" data-tooltip="Shares">
+                                            <i class="far fa-share-square"></i> 12
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="idea-footer">
+                                    <a href="{% url 'generate_caption' idea.id %}" class="btn-idea-primary">
+                                        <i class="fas fa-pen"></i> Write Caption
+                                    </a>
+                                    <button class="btn-idea-secondary copy-btn" onclick="copyIdea('{{ idea.title|escapejs }}', this)">
+                                        <i class="fas fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Bulk Actions -->
+                        <div class="mt-4 p-3 bg-light rounded-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Select multiple ideas to generate captions in bulk
+                                    </small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary me-2" onclick="selectAllIdeas()">
+                                        <i class="fas fa-check-double"></i> Select All
+                                    </button>
+                                    <button class="btn btn-sm btn-primary" onclick="bulkGenerate()">
+                                        <i class="fas fa-layer-group"></i> Bulk Generate
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-lightbulb"></i>
+                            </div>
+                            <h5 class="mb-3">No ideas generated yet</h5>
+                            <p class="text-muted mb-4">
+                                Fill out the form to generate AI-powered content ideas<br>
+                                tailored to your topic and audience.
+                            </p>
+                            
+                            <!-- Feature Highlights -->
+                            <div class="row g-3 mt-4">
+                                <div class="col-md-4">
+                                    <div class="p-3">
+                                        <i class="fas fa-bolt text-primary mb-2"></i>
+                                        <h6 class="small fw-bold">Fast Generation</h6>
+                                        <small class="text-muted">Get ideas in seconds</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3">
+                                        <i class="fas fa-brain text-success mb-2"></i>
+                                        <h6 class="small fw-bold">AI-Powered</h6>
+                                        <small class="text-muted">Smart suggestions</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3">
+                                        <i class="fas fa-chart-line text-info mb-2"></i>
+                                        <h6 class="small fw-bold">Trending Topics</h6>
+                                        <small class="text-muted">Stay relevant</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Example Topics -->
+                            <div class="mt-4">
+                                <small class="text-muted d-block mb-2">Popular topics:</small>
+                                <div class="d-flex gap-2 flex-wrap justify-content-center">
+                                    <span class="badge bg-light text-dark p-2">Social Media Marketing</span>
+                                    <span class="badge bg-light text-dark p-2">Digital Trends 2026</span>
+                                    <span class="badge bg-light text-dark p-2">Content Strategy</span>
+                                    <span class="badge bg-light text-dark p-2">Brand Storytelling</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Copy Success Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>Idea copied to clipboard!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enhanced copy function with animation
+function copyIdea(title, button) {
+    navigator.clipboard.writeText(title).then(function() {
+        // Button animation
+        button.classList.add('success');
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        
+        // Show toast
+        const toastEl = document.getElementById('copyToast');
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+        
+        // Reset button after 2 seconds
+        setTimeout(() => {
+            button.classList.remove('success');
+            button.innerHTML = '<i class="fas fa-copy"></i> Copy';
+        }, 2000);
+    });
+}
+
+// Form submission with loading state
+document.getElementById('ideaForm')?.addEventListener('submit', function(e) {
+    const btn = document.getElementById('generateBtn');
+    const spinner = document.getElementById('btnSpinner');
+    
+    btn.innerHTML = 'Generating... ';
+    btn.appendChild(spinner);
+    spinner.classList.remove('d-none');
+    btn.disabled = true;
+});
+
+// Bulk actions (to be implemented)
+function selectAllIdeas() {
+    document.querySelectorAll('.idea-card').forEach(card => {
+        card.classList.toggle('selected');
+    });
+}
+
+function bulkGenerate() {
+    alert('Bulk generation coming soon!');
+}
+
+// Character counter for topic field
+document.getElementById('{{ form.topic.id_for_label }}')?.addEventListener('input', function(e) {
+    const maxLength = 100;
+    const currentLength = e.target.value.length;
+    const remaining = maxLength - currentLength;
+    
+    let hint = document.querySelector('.input-hint');
+    if (remaining < 20) {
+        hint.innerHTML = `<i class="fas fa-exclamation-triangle text-warning"></i> ${remaining} characters remaining`;
+    } else {
+        hint.innerHTML = `<i class="fas fa-info-circle"></i> Main subject for your content`;
+    }
+});
+
+// Random example generator
+const examples = [
+    'Social Media Marketing',
+    'Digital Transformation',
+    'Content Strategy',
+    'Brand Building',
+    'Customer Engagement',
+    'Marketing Analytics',
+    'SEO Optimization',
+    'Email Marketing'
+];
+
+let exampleIndex = 0;
+setInterval(() => {
+    const topicInput = document.getElementById('{{ form.topic.id_for_label }}');
+    if (topicInput && !topicInput.value) {
+        topicInput.placeholder = `e.g., ${examples[exampleIndex]}`;
+        exampleIndex = (exampleIndex + 1) % examples.length;
+    }
+}, 3000);
+
+// Smooth scroll to new ideas
+if (window.location.hash === '#generated') {
+    document.querySelector('.ideas-grid')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+    });
+}
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth transitions
+    const cards = document.querySelectorAll('.idea-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transition = 'all 0.3s ease';
+        });
+    });
+});
+</script>
+{% endblock %}
