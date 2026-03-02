@@ -14,7 +14,6 @@
   
   <p align="center">
     <a href="#-features">Features</a> •
-    <a href="#-demo">Demo</a> •
     <a href="#-quick-start">Quick Start</a> •
     <a href="#-installation">Installation</a> •
     <a href="#-usage">Usage</a> •
@@ -31,8 +30,6 @@
 ## 📋 Table of Contents
 
 - [✨ Features](#-features)
-- [🚀 Demo](#-demo)
-- [📸 Screenshots](#-screenshots)
 - [⚡ Quick Start](#-quick-start)
 - [📦 Installation](#-installation)
 - [🔧 Configuration](#-configuration)
@@ -112,44 +109,7 @@
   <img src="https://img.icons8.com/color/48/000000/tiktok.png" alt="TikTok" title="TikTok"/>
 </div>
 
----
 
-## 🚀 Demo
-
-<div align="center">
-  <a href="https://your-demo-link.com">
-    <img src="https://img.shields.io/badge/Live%20Demo-Click%20Here-brightgreen?style=for-the-badge&logo=vercel" alt="Live Demo"/>
-  </a>
-  
-  ### Or watch the video demo:
-  
-  [![Watch the video](https://img.youtube.com/vi/your-video-id/maxresdefault.jpg)](https://youtu.be/your-video-id)
-</div>
-
----
-
-## 📸 Screenshots
-
-<div align="center">
-  <details>
-    <summary><b>Click to expand screenshots</b></summary>
-    <br/>
-    
-  | Home Page | Generate Ideas |
-  |:---:|:---:|
-  | <img src="screenshots/home.png" width="400"/> | <img src="screenshots/generate-ideas.png" width="400"/> |
-  
-  | Write Caption | Content Calendar |
-  |:---:|:---:|
-  | <img src="screenshots/write-caption.png" width="400"/> | <img src="screenshots/calendar.png" width="400"/> |
-  
-  | Saved Content | Content Detail |
-  |:---:|:---:|
-  | <img src="screenshots/saved-content.png" width="400"/> | <img src="screenshots/content-detail.png" width="400"/> |
-  </details>
-</div>
-
----
 
 ## ⚡ Quick Start
 
@@ -188,3 +148,76 @@ python manage.py createsuperuser
 python manage.py runserver
 
 # Visit http://127.0.0.1:8000 in your browser
+
+<details> <summary><b>🐧 Linux / MacOS Installation</b></summary>
+# Update system packages
+sudo apt update && sudo apt upgrade -y  # Ubuntu/Debian
+# OR
+brew update && brew upgrade  # MacOS
+
+# Install Python if not installed
+# Ubuntu/Debian
+sudo apt install python3 python3-pip python3-venv -y
+
+# MacOS
+brew install python3
+
+# Clone repository
+git clone https://github.com/yourusername/ai-content-creator.git
+cd ai-content-creator
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Upgrade pip
+pip install --upgrade pip
+
+# Install requirements
+pip install -r requirements.txt
+
+# Setup environment
+cp .env.example .env
+nano .env  # Add your API keys
+
+# Database setup
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+
+# Run server
+python manage.py runserver
+
+</details><details> <summary><b> Windows Installation</b></summary>
+
+# Install Python from python.org first, then:
+
+# Clone repository
+git clone https://github.com/yourusername/ai-content-creator.git
+cd ai-content-creator
+
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+venv\Scripts\activate
+
+# Upgrade pip
+python -m pip install --upgrade pip
+
+# Install requirements
+pip install -r requirements.txt
+
+# Setup environment
+copy .env.example .env
+# Edit .env with your API keys using notepad
+
+# Database setup
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+
+# Run server
+python manage.py runserver
+
+
