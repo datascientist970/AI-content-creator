@@ -1,223 +1,203 @@
-<div align="center">
-  <img src="https://raw.githubusercontent.com/datascientist970/ai-content-creator/main/content/static/content/images/hero-image.png" alt="AI Content Creator Banner" width="800"/>
-  
-  # 🤖 AI Content Creator
-  
-  ### Generate Engaging Social Media Content 50% Faster with Google's Gemini AI
-  
-  [![Django](https://img.shields.io/badge/Django-4.2-green.svg)](https://www.djangoproject.com/)
-  [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
-  [![Gemini AI](https://img.shields.io/badge/Gemini%20AI-Powered-orange.svg)](https://deepmind.google/technologies/gemini/)
-  [![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple.svg)](https://getbootstrap.com/)
-  [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-  
-  <p align="center">
-    <a href="#-features">Features</a> •
-    <a href="#-quick-start">Quick Start</a> •
-    <a href="#-installation">Installation</a> •
-    <a href="#-usage">Usage</a> •
-    <a href="#-api-reference">API</a> •
-    <a href="#-contributing">Contributing</a>
-  </p>
-  
-  [![Star on GitHub](https://img.shields.io/github/stars/yourusername/ai-content-creator?style=social)](https://github.com/yourusername/ai-content-creator/stargazers)
-  [![Follow on GitHub](https://img.shields.io/github/followers/yourusername?style=social)](https://github.com/yourusername)
-</div>
+# 🚀 AI Content Creator
+
+A beginner-friendly AI-powered content creation web application built with Django and Google Gemini API.
+
+This guide will help you install and run the project locally on your computer.
 
 ---
 
-## 📋 Table of Contents
+## 📌 Prerequisites
 
-- [✨ Features](#-features)
-- [⚡ Quick Start](#-quick-start)
-- [📦 Installation](#-installation)
-- [🔧 Configuration](#-configuration)
-- [🎯 Usage](#-usage)
-- [🏗️ Project Structure](#️-project-structure)
-- [📚 API Reference](#-api-reference)
-- [🧪 Testing](#-testing)
-- [📈 Performance](#-performance)
-- [🤝 Contributing](#-contributing)
-- [📝 License](#-license)
-- [🙏 Acknowledgments](#-acknowledgments)
-- [📞 Contact](#-contact)
+Before you begin, make sure you have:
+
+* Python 3.10 or higher installed
+* Git installed
+* Internet connection (for API access)
 
 ---
 
-## ✨ Features
+## 🛠 Installation Guide
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <img src="https://img.icons8.com/color/48/000000/idea.png" width="48" height="48"/>
-        <br/>
-        <b>Idea Generation</b>
-      </td>
-      <td align="center">
-        <img src="https://img.icons8.com/color/48/000000/writer-male.png" width="48" height="48"/>
-        <br/>
-        <b>Caption Writing</b>
-      </td>
-      <td align="center">
-        <img src="https://img.icons8.com/color/48/000000/calendar.png" width="48" height="48"/>
-        <br/>
-        <b>Content Calendar</b>
-      </td>
-    </tr>
-    <tr>
-      <td align="center">
-        <img src="https://img.icons8.com/color/48/000000/checked-checkbox.png" width="48" height="48"/>
-        <br/>
-        <b>Quality Checker</b>
-      </td>
-      <td align="center">
-        <img src="https://img.icons8.com/color/48/000000/hashtag.png" width="48" height="48"/>
-        <br/>
-        <b>Hashtag Suggestions</b>
-      </td>
-      <td align="center">
-        <img src="https://img.icons8.com/color/48/000000/bar-chart.png" width="48" height="48"/>
-        <br/>
-        <b>Analytics</b>
-      </td>
-    </tr>
-  </table>
-</div>
+Follow the steps below carefully.
 
-### 🎯 Core Features
+---
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| 🤖 **AI-Powered Ideas** | Generate engaging content ideas using Google's Gemini AI | ✅ |
-| 📝 **Smart Captions** | Write platform-optimized captions with multiple tone options | ✅ |
-| 📅 **Content Calendar** | Schedule posts at optimal times for each platform | ✅ |
-| 🏷️ **Hashtag Generator** | Get relevant hashtag suggestions automatically | ✅ |
-| ⭐ **Quality Scoring** | Auto-evaluate content quality before publishing | ✅ |
-| 📊 **Analytics** | Track content performance and engagement | 🚧 |
-| 🔄 **Bulk Generation** | Generate multiple captions at once | 🚧 |
-| 📱 **Multi-Platform** | Support for all major social media platforms | ✅ |
+### 1️⃣ Install Python
 
-### 🎨 Supported Platforms
+Download and install Python from:
 
-<div align="center">
-  <img src="https://img.icons8.com/color/48/000000/linkedin.png" alt="LinkedIn" title="LinkedIn"/>
-  <img src="https://img.icons8.com/color/48/000000/instagram-new.png" alt="Instagram" title="Instagram"/>
-  <img src="https://img.icons8.com/color/48/000000/twitter.png" alt="Twitter" title="Twitter"/>
-  <img src="https://img.icons8.com/color/48/000000/facebook.png" alt="Facebook" title="Facebook"/>
-  <img src="https://img.icons8.com/color/48/000000/tiktok.png" alt="TikTok" title="TikTok"/>
-</div>
+[https://www.python.org/downloads/](https://www.python.org/downloads/)
 
+⚠ Important:
 
+* During installation, make sure to check **"Add Python to PATH"**
 
-## ⚡ Quick Start
-
-Get up and running in 5 minutes:
+After installation, verify:
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/ai-content-creator.git
+python --version
+```
 
-# Navigate to project directory
-cd ai-content-creator
+---
 
-# Create virtual environment
+### 2️⃣ Clone the Repository
+
+Open Command Prompt (Windows) or Terminal (Mac/Linux) and run:
+
+```bash
+git clone https://github.com/datascientist970/AI-content-creator.git
+```
+
+---
+
+### 3️⃣ Navigate to the Project Directory
+
+```bash
+cd AI-content-creator
+```
+
+---
+
+### 4️⃣ Create a Virtual Environment
+
+#### Windows:
+
+```bash
 python -m venv venv
+```
 
-# Activate virtual environment
-# On Windows:
-venv\Scripts\activate
-# On Mac/Linux:
-source venv/bin/activate
+#### Mac/Linux:
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your API keys
-
-# Run migrations
-python manage.py migrate
-
-# Create superuser
-python manage.py createsuperuser
-
-# Start development server
-python manage.py runserver
-
-# Visit http://127.0.0.1:8000 in your browser
-
-<details> <summary><b>🐧 Linux / MacOS Installation</b></summary>
-# Update system packages
-sudo apt update && sudo apt upgrade -y  # Ubuntu/Debian
-# OR
-brew update && brew upgrade  # MacOS
-
-# Install Python if not installed
-# Ubuntu/Debian
-sudo apt install python3 python3-pip python3-venv -y
-
-# MacOS
-brew install python3
-
-# Clone repository
-git clone https://github.com/yourusername/ai-content-creator.git
-cd ai-content-creator
-
-# Create and activate virtual environment
+```bash
 python3 -m venv venv
-source venv/bin/activate
+```
 
-# Upgrade pip
-pip install --upgrade pip
+---
 
-# Install requirements
-pip install -r requirements.txt
+### 5️⃣ Activate the Virtual Environment
 
-# Setup environment
-cp .env.example .env
-nano .env  # Add your API keys
+#### Windows (Command Prompt):
 
-# Database setup
-python manage.py makemigrations
-python manage.py migrate
-python manage.py createsuperuser
-
-# Run server
-python manage.py runserver
-
-</details><details> <summary><b> Windows Installation</b></summary>
-
-# Install Python from python.org first, then:
-
-# Clone repository
-git clone https://github.com/yourusername/ai-content-creator.git
-cd ai-content-creator
-
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
+```bash
 venv\Scripts\activate
+```
 
-# Upgrade pip
-python -m pip install --upgrade pip
+#### Windows (PowerShell):
 
-# Install requirements
+```bash
+.\venv\Scripts\Activate
+```
+
+#### Mac/Linux:
+
+```bash
+source venv/bin/activate
+```
+
+✅ You should now see `(venv)` at the beginning of your terminal line.
+
+---
+
+### 6️⃣ Install Project Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# Setup environment
-copy .env.example .env
-# Edit .env with your API keys using notepad
+---
 
-# Database setup
-python manage.py makemigrations
+## 🔑 Configure Gemini API
+
+This project uses Google Gemini API for AI content generation.
+
+### 7️⃣ Get Your API Key
+
+1. Go to: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+2. Click **"Create API Key"**
+3. Copy your API key
+
+---
+
+### 8️⃣ Add API Key to Environment File
+
+1. Locate `.env.example` inside the project folder
+2. Rename it to `.env`
+3. Open `.env` and add:
+
+```
+GEMINI_API_KEY=YOUR_API_KEY_HERE
+```
+
+4. Save the file
+
+⚠ Do NOT share your `.env` file publicly.
+
+---
+
+## 🗄 Database Setup
+
+Run database migrations:
+
+```bash
 python manage.py migrate
-python manage.py createsuperuser
+```
 
-# Run server
+---
+
+## ▶ Run the Development Server
+
+```bash
 python manage.py runserver
+```
 
+---
 
+## 🌐 Access the Application
+
+Open your browser and visit:
+
+```
+http://127.0.0.1:8000/
+```
+
+Your AI Content Creator app should now be running locally 🎉
+
+---
+
+## 🛑 Troubleshooting
+
+* If `(venv)` is not visible → Activate the virtual environment again
+* If `python` command not found → Reinstall Python and check "Add to PATH"
+* If API errors occur → Make sure your Gemini API key is correct in `.env`
+
+---
+
+## 📂 Project Structure (Basic Overview)
+
+```
+AI-content-creator/
+│
+├── manage.py
+├── requirements.txt
+├── .env
+├── app/
+└── templates/
+```
+
+---
+
+## 📄 License
+
+This project is for educational purposes.
+
+---
+
+## 🙌 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+---
+
+## ⭐ Support
+
+If you found this project helpful, consider giving it a ⭐ on GitHub!
