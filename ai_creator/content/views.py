@@ -150,50 +150,50 @@ def generate_caption(request, idea_id=None):
 
 # Content Detail View
 def content_detail(request, content_id):
-    """View generated content details"""
     content = get_object_or_404(GeneratedContent, id=content_id)
     quality_checks = content.quality_checks.all()
     
-    # Parse JSON fields
+    # Process hashtags
+    hashtags_list = []
+    if content.hashtags:
+        hashtags_list = [tag.strip() for tag in content.hashtags.split(',') if tag.strip()]
+    
+    # Process quality checks
     for check in quality_checks:
-        if check.issues and check.issues != '[]':
+        if check.issues:
             try:
-                check.issues_list = json.loads(check.issues)
+                check.issues_list = [issue.strip() for issue in check.issues.split(',') if issue.strip()]
             except:
-                check.issues_list = [check.issues]
+                check.issues_list = []
         else:
             check.issues_list = []
             
-        if check.suggestions and check.suggestions != '[]':
+        if check.suggestions:
             try:
-                check.suggestions_list = json.loads(check.suggestions)
+                check.suggestions_list = [sugg.strip() for sugg in check.suggestions.split(',') if sugg.strip()]
             except:
-                check.suggestions_list = [check.suggestions]
+                check.suggestions_list = []
         else:
             check.suggestions_list = []
     
-    if request.method == 'POST':
-        # Update content status
-        action = request.POST.get('action')
-        if action == 'approve':
-            content.status = 'approved'
-            messages.success(request, 'Content approved!')
-        elif action == 'reject':
-            content.status = 'rejected'
-            messages.warning(request, 'Content rejected.')
-        elif action == 'schedule':
-            content.status = 'approved'
-            content.save()
-            return redirect('schedule_content', content_id=content.id)
-        elif action == 'regenerate':
-            return redirect('generate_caption', idea_id=content.idea.id)
-        
-        content.save()
+    # Calculate values
+    word_count_percentage = min(100, (content.word_count / 300) * 100) if content.word_count else 0
     
-    return render(request, 'content/content_detail.html', {
+    # Calculate circle offset for quality gauge
+    circumference = 2 * 3.14159 * 70  # 2πr where r=70
+    quality_circle_offset = circumference - (content.quality_score * circumference)
+    
+    context = {
         'content': content,
-        'quality_checks': quality_checks
-    })
+        'quality_checks': quality_checks,
+        'hashtags_list': hashtags_list,
+        'word_count_percentage': word_count_percentage,
+        'quality_circle_offset': quality_circle_offset,
+        'estimated_likes': getattr(content, 'estimated_likes', 234),
+        'estimated_comments': getattr(content, 'estimated_comments', 45),
+    }
+    
+    return render(request, 'content/content_detail.html', context)
 
 # Calendar View
 def calendar_view(request):
