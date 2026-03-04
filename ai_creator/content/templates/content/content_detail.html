@@ -1,0 +1,1151 @@
+{% extends 'content/base.html' %}
+{% load static %}
+
+{% block title %}Content Details - AI Content Creator{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Modern CSS Variables */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        --warning-gradient: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+        --danger-gradient: linear-gradient(135deg, #eb5757 0%, #f2994a 100%);
+        --glass-bg: rgba(255, 255, 255, 0.95);
+        --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+        --shadow-sm: 0 10px 40px rgba(0, 0, 0, 0.08);
+        --shadow-md: 0 20px 60px rgba(0, 0, 0, 0.12);
+        --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.15);
+        --border-radius: 24px;
+        --border-radius-sm: 16px;
+    }
+
+    /* Page Header */
+    .page-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 40px;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+        pointer-events: none;
+    }
+
+    .page-header h1 {
+        font-weight: 800;
+        margin-bottom: 10px;
+        position: relative;
+        font-size: 2.5rem;
+    }
+
+    .page-header .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        position: relative;
+    }
+
+    .page-header .breadcrumb-item a {
+        color: rgba(255,255,255,0.8);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .page-header .breadcrumb-item a:hover {
+        color: white;
+    }
+
+    .page-header .breadcrumb-item.active {
+        color: white;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        gap: 8px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .status-badge.draft {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+
+    .status-badge.review {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-badge.approved {
+        background: #d1fae5;
+        color: #059669;
+    }
+
+    .status-badge.published {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .status-badge.rejected {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* Platform Badge */
+    .platform-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1rem;
+        gap: 10px;
+        color: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .platform-badge.linkedin { background: #0077b5; }
+    .platform-badge.instagram { background: #e4405f; }
+    .platform-badge.twitter { background: #1da1f2; }
+    .platform-badge.facebook { background: #1877f2; }
+    .platform-badge.tiktok { background: #000000; }
+
+    /* Content Card */
+    .content-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-bottom: 30px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .content-card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+
+    .content-header {
+        padding: 25px 30px;
+        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .content-body {
+        padding: 30px;
+    }
+
+    .content-footer {
+        padding: 20px 30px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* Caption Preview */
+    .caption-preview {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: var(--border-radius-sm);
+        padding: 30px;
+        margin: 20px 0;
+        border-left: 4px solid #667eea;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #2d3748;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .caption-preview p {
+        margin-bottom: 1rem;
+    }
+
+    .caption-preview p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Hashtag Container */
+    .hashtag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 2px dashed #e2e8f0;
+    }
+
+    .hashtag {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        color: #667eea;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border: 1px solid #667eea30;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .hashtag:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: transparent;
+    }
+
+    .hashtag i {
+        margin-right: 5px;
+        font-size: 0.8rem;
+    }
+
+    /* Quality Score */
+    .quality-gauge {
+        text-align: center;
+        padding: 25px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: var(--border-radius-sm);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .quality-circle {
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 20px;
+        position: relative;
+    }
+
+    .quality-circle svg {
+        width: 140px;
+        height: 140px;
+        transform: rotate(-90deg);
+    }
+
+    .quality-circle circle {
+        fill: none;
+        stroke-width: 8;
+        stroke-linecap: round;
+    }
+
+    .quality-circle .bg-circle {
+        stroke: #e2e8f0;
+    }
+
+    .quality-circle .progress-circle {
+        stroke: url(#gradient);
+        stroke-dasharray: 377;
+        stroke-dashoffset: 377;
+        transition: stroke-dashoffset 1.5s ease;
+    }
+
+    .quality-score {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Metric Cards */
+    .metric-card {
+        background: white;
+        border-radius: var(--border-radius-sm);
+        padding: 20px 15px;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(102,126,234,0.1);
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: #667eea30;
+    }
+
+    .metric-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        color: #667eea;
+        font-size: 1.8rem;
+        transition: all 0.3s ease;
+    }
+
+    .metric-card:hover .metric-icon {
+        background: var(--primary-gradient);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .metric-label {
+        color: #718096;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    /* Tabs */
+    .custom-tabs {
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 30px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .custom-tab {
+        padding: 12px 28px;
+        color: #718096;
+        font-weight: 600;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+        border-radius: 50px 50px 0 0;
+        font-size: 1rem;
+    }
+
+    .custom-tab:hover {
+        color: #667eea;
+        background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+    }
+
+    .custom-tab.active {
+        color: #667eea;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    }
+
+    .custom-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: var(--primary-gradient);
+        border-radius: 3px 3px 0 0;
+    }
+
+    /* Tab Content */
+    .tab-content {
+        display: block;
+    }
+
+    .tab-content[style*="display: none"] {
+        display: none;
+    }
+
+    /* Timeline */
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea30 0%, #764ba230 100%);
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 50px;
+        margin-bottom: 30px;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: 13px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
+        z-index: 2;
+    }
+
+    .timeline-date {
+        font-size: 0.9rem;
+        color: #667eea;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .timeline-title {
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: #2d3748;
+        font-size: 1.1rem;
+    }
+
+    .timeline-description {
+        color: #718096;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: none;
+        cursor: pointer;
+        font-size: 0.95rem;
+        box-shadow: var(--shadow-sm);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .action-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .action-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .action-btn.approve {
+        background: var(--success-gradient);
+        color: white;
+    }
+
+    .action-btn.reject {
+        background: var(--danger-gradient);
+        color: white;
+    }
+
+    .action-btn.schedule {
+        background: var(--primary-gradient);
+        color: white;
+    }
+
+    /* Quality Analysis Cards */
+    .quality-card {
+        background: white;
+        border-radius: var(--border-radius-sm);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+    }
+
+    .quality-card:hover {
+        transform: translateX(5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .quality-card.issues {
+        border-left-color: #dc2626;
+    }
+
+    .quality-card.suggestions {
+        border-left-color: #10b981;
+    }
+
+    /* Related Content Cards */
+    .related-card {
+        background: white;
+        border-radius: var(--border-radius-sm);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        height: 100%;
+        border: 1px solid rgba(102,126,234,0.1);
+    }
+
+    .related-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: #667eea30;
+    }
+
+    .related-card .card-body {
+        padding: 20px;
+    }
+
+    .related-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        color: #667eea;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    /* Toast */
+    .toast-container-custom {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .toast-custom {
+        background: var(--success-gradient);
+        color: white;
+        border-radius: 50px;
+        padding: 12px 24px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 2rem;
+        }
+        
+        .content-header {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start !important;
+        }
+        
+        .custom-tabs {
+            flex-wrap: wrap;
+        }
+        
+        .custom-tab {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'index' %}"><i class="fas fa-home me-1"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'saved_content' %}"><i class="fas fa-save me-1"></i>Saved Content</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Content Details</li>
+            </ol>
+        </nav>
+        <h1><i class="fas fa-file-alt me-3"></i>Content Details</h1>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- Content Card -->
+    <div class="content-card" data-aos="fade-up">
+        <div class="content-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h3 class="mb-3 fw-bold" style="font-size: 1.5rem;">{{ content.idea.title }}</h3>
+                <div class="d-flex gap-3 flex-wrap">
+                    <span class="status-badge {{ content.status }}">
+                        <i class="fas 
+                            {% if content.status == 'draft' %}fa-pen
+                            {% elif content.status == 'review' %}fa-eye
+                            {% elif content.status == 'approved' %}fa-check-circle
+                            {% elif content.status == 'published' %}fa-globe
+                            {% elif content.status == 'rejected' %}fa-times-circle
+                            {% else %}fa-question-circle{% endif %}">
+                        </i>
+                        {{ content.get_status_display }}
+                    </span>
+                    <span class="platform-badge {{ content.idea.platform }}">
+                        <i class="fab fa-{{ content.idea.platform }}"></i>
+                        {{ content.idea.get_platform_display }}
+                    </span>
+                </div>
+            </div>
+            <div class="text-md-end">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="far fa-clock text-primary"></i>
+                    <small class="text-muted">Created {{ content.created_at|timesince }} ago</small>
+                </div>
+                <small class="text-muted d-block mt-1">
+                    <i class="far fa-calendar-alt me-1"></i>{{ content.created_at|date:"F d, Y - h:i A" }}
+                </small>
+            </div>
+        </div>
+
+        <div class="content-body">
+            <!-- Tabs -->
+            <div class="custom-tabs">
+                <span class="custom-tab active" onclick="showTab('preview', this)">📝 Preview</span>
+                <span class="custom-tab" onclick="showTab('analysis', this)">📊 Analysis</span>
+                <span class="custom-tab" onclick="showTab('history', this)">📅 History</span>
+            </div>
+
+            <!-- Tab: Preview -->
+            <div id="preview-tab" class="tab-content">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h5 class="mb-3">
+                            <i class="fas fa-quote-left text-primary me-2"></i>
+                            Caption
+                            <small class="text-muted ms-2">({{ content.word_count|default:0 }} words)</small>
+                        </h5>
+                        
+                        <!-- Caption Preview -->
+                        <div class="caption-preview">
+                            {% if content.caption %}
+                                {% for line in content.caption.splitlines %}
+                                    <p>{{ line }}</p>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted fst-italic">No caption available</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Hashtags Section -->
+                     
+{% if content.hashtags %}
+<div class="hashtag-container">
+    <span class="text-muted me-2"><i class="fas fa-hashtag"></i></span>
+    {% with hashtags=content.hashtags.split %}
+        {% for tag in hashtags %}
+            {% if tag|length > 1 %}
+                <span class="hashtag">{{ tag }}</span>
+            {% endif %}
+        {% endfor %}
+    {% endwith %}
+</div>
+{% endif %}
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <!-- Quality Gauge -->
+                        <div class="quality-gauge">
+                            <h6 class="mb-3 fw-bold">Quality Score</h6>
+                            <div class="quality-circle">
+                                <svg viewBox="0 0 160 160">
+                                    <defs>
+                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#667eea"/>
+                                            <stop offset="100%" stop-color="#764ba2"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <circle class="bg-circle" cx="80" cy="80" r="70" stroke="#e2e8f0" stroke-width="8" fill="none"/>
+                                    <circle class="progress-circle" cx="80" cy="80" r="70" stroke="url(#gradient)" stroke-width="8" fill="none" 
+                                            stroke-dasharray="440" stroke-dashoffset="440"/>
+                                </svg>
+                                <span class="quality-score">{{ content.quality_score|floatformat:2|default:"0.00" }}</span>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Word Count</span>
+                                    <span class="fw-bold">{{ content.word_count|default:0 }} / 300</span>
+                                </div>
+                                <div class="progress" style="height: 10px; border-radius: 10px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ word_count_percentage }}%; border-radius: 10px;"
+                                         aria-valuenow="{{ word_count_percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Stats -->
+                        <div class="row g-3 mt-4">
+                            <div class="col-6">
+                                <div class="metric-card">
+                                    <div class="metric-icon">
+                                        <i class="fas fa-heart"></i>
+                                    </div>
+                                    <div class="metric-value">{{ estimated_likes|default:"234" }}</div>
+                                    <div class="metric-label">Est. Likes</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="metric-card">
+                                    <div class="metric-icon">
+                                        <i class="fas fa-comment"></i>
+                                    </div>
+                                    <div class="metric-value">{{ estimated_comments|default:"45" }}</div>
+                                    <div class="metric-label">Est. Comments</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Analysis -->
+            <div id="analysis-tab" class="tab-content" style="display: none;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-4">
+                            <i class="fas fa-clipboard-check text-success me-2"></i>
+                            Quality Analysis
+                        </h5>
+                        
+                        {% for check in quality_checks %}
+                        <div class="quality-card issues">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h6 class="fw-bold mb-0">Check #{{ forloop.counter }}</h6>
+                                <span class="badge bg-primary rounded-pill">Score: {{ check.score|floatformat:2 }}</span>
+                            </div>
+                            
+                            {% if check.issues %}
+                            <div class="mb-3">
+                                <p class="text-danger fw-bold mb-2"><i class="fas fa-exclamation-circle me-2"></i>Issues:</p>
+                                <ul class="list-unstyled">
+                                    <script>
+                                        (function() {
+                                            const container = document.currentScript.parentElement;
+                                            const issues = {{ check.issues|safe|escapejs }};
+                                            if (issues && container) {
+                                                const issuesList = issues.split(',').map(i => i.trim()).filter(i => i);
+                                                issuesList.forEach(issue => {
+                                                    const li = document.createElement('li');
+                                                    li.className = 'text-danger mb-2';
+                                                    li.innerHTML = '<i class="fas fa-times-circle me-2"></i>' + issue;
+                                                    container.appendChild(li);
+                                                });
+                                            }
+                                        })();
+                                    </script>
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            {% if check.suggestions %}
+                            <div>
+                                <p class="text-success fw-bold mb-2"><i class="fas fa-lightbulb me-2"></i>Suggestions:</p>
+                                <ul class="list-unstyled">
+                                    <script>
+                                        (function() {
+                                            const container = document.currentScript.parentElement;
+                                            const suggestions = {{ check.suggestions|safe|escapejs }};
+                                            if (suggestions && container) {
+                                                const suggestionsList = suggestions.split(',').map(s => s.trim()).filter(s => s);
+                                                suggestionsList.forEach(suggestion => {
+                                                    const li = document.createElement('li');
+                                                    li.className = 'text-success mb-2';
+                                                    li.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + suggestion;
+                                                    container.appendChild(li);
+                                                });
+                                            }
+                                        })();
+                                    </script>
+                                </ul>
+                            </div>
+                            {% endif %}
+                            
+                            <small class="text-muted d-block mt-3">
+                                <i class="far fa-clock me-1"></i>{{ check.checked_at|timesince }} ago
+                            </small>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-5 bg-light rounded-4">
+                            <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No quality checks performed yet.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5 class="mb-4">
+                            <i class="fas fa-chart-pie text-info me-2"></i>
+                            Performance Metrics
+                        </h5>
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <canvas id="metricsChart" width="400" height="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: History -->
+            <div id="history-tab" class="tab-content" style="display: none;">
+                <h5 class="mb-4">
+                    <i class="fas fa-history text-primary me-2"></i>
+                    Version History
+                </h5>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">{{ content.created_at|date:"M d, Y - h:i A" }}</div>
+                        <div class="timeline-title">✨ Content Created</div>
+                        <div class="timeline-description">Initial version generated by AI</div>
+                    </div>
+                    
+                    {% if content.status == 'approved' %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">{{ content.updated_at|date:"M d, Y - h:i A" }}</div>
+                        <div class="timeline-title">✅ Content Approved</div>
+                        <div class="timeline-description">Approved for publishing by reviewer</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% for entry in content.calendar_entries.all %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">{{ entry.scheduled_date|date:"M d, Y" }} at {{ entry.scheduled_time|time:"h:i A" }}</div>
+                        <div class="timeline-title">
+                            <i class="fab fa-{{ entry.platform }} me-2"></i>
+                            Scheduled for {{ entry.platform|title }}
+                        </div>
+                        {% if entry.is_posted %}
+                        <div class="timeline-description text-success">
+                            <i class="fas fa-check-circle me-2"></i>Published on {{ entry.posted_at|date:"M d, Y" }}
+                        </div>
+                        {% else %}
+                        <div class="timeline-description text-warning">
+                            <i class="fas fa-clock me-2"></i>Awaiting publication
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="content-footer">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <a href="{% url 'saved_content' %}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Saved Content
+                    </a>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <!-- Action Buttons based on status -->
+                    {% if content.status == 'draft' or content.status == 'review' %}
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="action-btn approve">
+                            <i class="fas fa-check-circle me-2"></i>Approve
+                        </button>
+                    </form>
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit" class="action-btn reject">
+                            <i class="fas fa-times-circle me-2"></i>Reject
+                        </button>
+                    </form>
+                    
+                    <a href="{% url 'generate_caption' content.idea.id %}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-edit me-2"></i>Edit
+                    </a>
+                    {% endif %}
+                    
+                    {% if content.status == 'approved' %}
+                    <a href="{% url 'schedule_content' content.id %}" class="action-btn schedule">
+                        <i class="fas fa-calendar-plus me-2"></i>Schedule Post
+                    </a>
+                    {% endif %}
+                    
+                    <button class="btn btn-outline-primary btn-lg" onclick="copyContent()">
+                        <i class="fas fa-copy me-2"></i>Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Content Section -->
+    {% if content.idea.contents.all|length > 1 %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 class="mb-4">
+                <i class="fas fa-link text-primary me-2"></i>
+                Related Content
+                <small class="text-muted ms-2">Other versions of this idea</small>
+            </h4>
+        </div>
+        
+        {% for related in content.idea.contents.all %}
+        {% if related.id != content.id %}
+        <div class="col-md-4 mb-4">
+            <div class="related-card">
+                <div class="card-body">
+                    <div class="related-badge">
+                        <i class="far fa-clock me-1"></i>{{ related.created_at|date:"M d, Y" }}
+                    </div>
+                    <h6 class="card-title fw-bold mb-3">{{ related.caption|truncatechars:60 }}</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge {% if related.quality_score > 0.7 %}bg-success{% else %}bg-warning{% endif %}">
+                            Score: {{ related.quality_score|floatformat:2 }}
+                        </span>
+                        <a href="{% url 'content_detail' related.id %}" class="btn btn-sm btn-outline-primary">
+                            View <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container-custom" id="toastContainer"></div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Tab switching function
+function showTab(tabName, element) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.custom-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + '-tab').style.display = 'block';
+    
+    // Add active class to clicked tab
+    element.classList.add('active');
+    
+    // Initialize chart if analysis tab
+    if (tabName === 'analysis') {
+        setTimeout(initMetricsChart, 100);
+    }
+}
+
+// Simple copy function
+function copyContent() {
+    // Get the caption text
+    const captionElement = document.querySelector('.caption-preview');
+    let text = '';
+    
+    if (captionElement) {
+        text = captionElement.innerText || captionElement.textContent;
+    }
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Content copied to clipboard!');
+    }).catch(function() {
+        alert('Failed to copy content');
+    });
+}
+
+// Copy to clipboard helper
+function copyToClipboard(text, message) {
+    navigator.clipboard.writeText(text).then(function() {
+        showToast(message || 'Copied to clipboard!');
+    }).catch(function(err) {
+        showToast('Failed to copy', 'error');
+    });
+}
+
+// Show toast notification
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast-custom';
+    toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s reverse';
+        setTimeout(() => {
+            container.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
+
+// Initialize metrics chart
+function initMetricsChart() {
+    const canvas = document.getElementById('metricsChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destroy existing chart
+    if (window.metricsChart) {
+        window.metricsChart.destroy();
+    }
+    
+    window.metricsChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Hook Strength', 'Engagement', 'Clarity', 'Platform Fit', 'Call to Action', 'Hashtags'],
+            datasets: [{
+                label: 'Quality Metrics',
+                data: [7.5, 7.8, 8.2, 7.9, 7.3, 8.5],
+                backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                borderColor: '#667eea',
+                borderWidth: 3,
+                pointBackgroundColor: '#667eea',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: '#667eea',
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 10,
+                    ticks: {
+                        stepSize: 2,
+                        backdropColor: 'transparent'
+                    },
+                    grid: {
+                        color: 'rgba(102, 126, 234, 0.1)'
+                    },
+                    pointLabels: {
+                        font: {
+                            size: 12,
+                            weight: '600',
+                            family: 'Inter'
+                        },
+                        color: '#4a5568'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 13 },
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            },
+            maintainAspectRatio: true,
+            responsive: true
+        }
+    });
+}
+
+// Animate quality circle on load
+document.addEventListener('DOMContentLoaded', function() {
+    const circle = document.querySelector('.progress-circle');
+    if (circle) {
+        const score = {{ content.quality_score|default:0 }};
+        const circumference = 2 * Math.PI * 70;
+        const offset = circumference - (score * circumference);
+        setTimeout(() => {
+            circle.style.strokeDashoffset = offset;
+        }, 100);
+    }
+    
+    // Add animation on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.metric-card, .quality-card, .related-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'all 0.6s ease';
+        observer.observe(el);
+    });
+});
+</script>
+{% endblock %}
